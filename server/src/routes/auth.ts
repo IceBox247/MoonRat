@@ -44,19 +44,35 @@ authRouter.post('/telegram', async (req, res) => {
       const inviter = await prisma.user.findUnique({ where: { referralCode: refFromStart } });
       if (inviter && inviter.telegramId !== tgId) referredByCode = refFromStart;
     }
-    user = await prisma.user.create({
-      data: {
-        telegramId: tgId,
-        username: verified.user.username,
-        firstName: verified.user.first_name,
-        lastName: verified.user.last_name,
-        photoUrl: verified.user.photo_url,
-        languageCode: verified.user.language_code,
-        referralCode,
-        referredByCode,
-      },
-    });
-    await prisma.miningSession.create({ data: { userId: user.id } });
+    try {
+      user = await prisma.user.create({
+        data: {
+          telegramId: tgId,
+          username: verified.user.username,
+          firstName: verified.user.first_name,
+          lastName: verified.user.last_name,
+          photoUrl: verified.user.photo_url,
+          languageCode: verified.user.language_code,
+          referralCode,
+          referredByCode,
+        },
+      });
+    } catch (e: any) {
+      // Concurrent first-login (e.g. double-fired request) can race on telegramId.
+      if (e?.code === 'P2002') {
+        user = await prisma.user.findUnique({ where: { telegramId: tgId } });
+      } else {
+        throw e;
+      }
+    }
+    if (user) {
+      // Idempotent session creation (safe under the same race).
+      await prisma.miningSession.upsert({
+        where: { userId: user.id },
+        update: {},
+        create: { userId: user.id },
+      });
+    }
   } else {
     user = await prisma.user.update({
       where: { id: user.id },
@@ -69,6 +85,7 @@ authRouter.post('/telegram', async (req, res) => {
     });
   }
 
+  if (!user) return res.status(500).json({ error: 'user_create_failed' });
   if (user.isBanned) return res.status(403).json({ error: 'banned' });
 
   const token = signUserToken({ uid: user.id, tg: user.telegramId });
