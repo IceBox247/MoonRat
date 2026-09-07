@@ -1,0 +1,100 @@
+.stage {
+  position: relative;
+  height: 300px;
+  display: grid;
+  place-items: center;
+  margin: 6px 0 2px;
+  overflow: visible;
+}
+
+.stage-glow {
+  position: absolute;
+  bottom: 26px;
+  width: 220px;
+  height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(53, 230, 255, 0.55), rgba(42, 183, 255, 0.15) 45%, transparent 70%);
+  filter: blur(6px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.stage-active .stage-glow {
+  animation: pulseGlow 1.2s ease-in-out infinite;
+}
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+
+.stage-ring {
+  position: absolute;
+  bottom: 12px;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  border: 1px solid rgba(53, 230, 255, 0.14);
+  box-shadow: inset 0 0 60px rgba(53, 230, 255, 0.08);
+  mask: radial-gradient(circle, transparent 60%, black 61%);
+  -webkit-mask: radial-gradient(circle, transparent 60%, black 61%);
+}
+.stage-active .stage-ring {
+  animation: spin 12s linear infinite;
+  border-color: rgba(53, 230, 255, 0.3);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.stage-rat {
+  position: relative;
+  z-index: 3;
+  width: 260px;
+  height: auto;
+  filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.6));
+  transform-origin: 60% 80%;
+}
+.stage-active .stage-rat {
+  filter: drop-shadow(0 0 26px rgba(53, 230, 255, 0.35)) drop-shadow(0 14px 24px rgba(0, 0, 0, 0.6));
+}
+
+.shard {
+  position: absolute;
+  bottom: 40px;
+  width: 8px;
+  height: 8px;
+  z-index: 2;
+  background: linear-gradient(180deg, #bff4ff, var(--cyan));
+  clip-path: polygon(50% 0, 100% 40%, 50% 100%, 0 40%);
+  box-shadow: 0 0 10px var(--cyan-glow);
+}
+
+.spark {
+  position: absolute;
+  z-index: 4;
+  right: 30%;
+  top: 46%;
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle, rgba(255, 240, 180, 0.9), rgba(255, 203, 69, 0.2) 50%, transparent 70%);
+  border-radius: 50%;
+}
+
+.status-chip {
+  position: absolute;
+  bottom: -6px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(8, 11, 24, 0.8);
+  border: 1px solid var(--line-strong);
+  backdrop-filter: blur(8px);
+}
+.status-chip .dot { width: 7px; height: 7px; border-radius: 50%; }
+.status-chip.on { color: var(--good); border-color: rgba(67, 229, 155, 0.4); }
+.status-chip.on .dot { background: var(--good); box-shadow: 0 0 8px var(--good); animation: blink 1s infinite; }
+.status-chip.off { color: var(--text-faint); }
+.status-chip.off .dot { background: var(--text-faint); }
+@keyframes blink { 50% { opacity: 0.3; } }

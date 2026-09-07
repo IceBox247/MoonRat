@@ -1,0 +1,212 @@
+// Moonrat database schema.
+// Dev: SQLite (zero setup). Production: switch `provider` to "postgresql" and set DATABASE_URL.
+// NOTE: SQLite has no native enum/decimal. We use String for enums (documented values)
+// and Float for token amounts in human units. For production-grade token precision,
+// migrate amount columns to Decimal on Postgres.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Players
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String   @id @default(cuid())
+  telegramId    String   @unique
+  username      String?
+  firstName     String?
+  lastName      String?
+  photoUrl      String?
+  languageCode  String?
+
+  // Wallet + on-chain state (balance in human token units; refreshed from chain)
+  walletAddress   String?
+  moonratBalance  Float    @default(0)
+  balanceUpdatedAt DateTime?
+
+  // Derived mining state
+  hashRate       Float     @default(0)
+  minerLevelKey  String    @default("rookie")
+
+  // Ledger totals (human units)
+  minedTotal     Float     @default(0)
+  claimedTotal   Float     @default(0)
+  vaultBalance   Float     @default(0) // claimed-but-not-withdrawn rewards
+
+  // Referrals
+  referralCode   String    @unique
+  referredByCode String?
+
+  // Meta
+  role        String   @default("user") // user | admin
+  isBanned    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+
+  session       MiningSession?
+  claims        Claim[]
+  vaultTxns     VaultTransaction[]
+  missionState  UserMission[]
+
+  @@index([referredByCode])
+}
+
+model MiningSession {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  active           Boolean  @default(false)
+  startedAt        DateTime?
+  lastAccruedAt    DateTime?
+  endedAt          DateTime?
+  hashRateSnapshot Float    @default(0)
+  accruedUnclaimed Float    @default(0) // pending rewards not yet claimed
+  updatedAt        DateTime @updatedAt
+}
+
+model Claim {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Float
+  status    String   @default("credited") // credited | onchain_pending | onchain_settled | failed
+  txHash    String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model VaultTransaction {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // mining_claim | referral_reward | mission_reward | withdrawal | adjustment
+  amount    Float    // positive = credit, negative = debit
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Configurable economy
+// ---------------------------------------------------------------------------
+
+// Singleton row (id = "singleton") holding tunable mining economics.
+model MiningConfig {
+  id               String  @id @default("singleton")
+  strategy         String  @default("sqrt") // linear | sqrt | log | tiered
+  baseHashRate     Float   @default(10)     // floor hashrate for any connected miner
+  holdingsFactor   Float   @default(1.0)    // multiplier applied to balance term
+  balanceUnit      Float   @default(1000)   // balance is divided by this before formula
+  globalRatePerSec Float   @default(0.00027) // $MOONRAT minted per hashRate-unit per second
+  maxHashRate      Float   @default(100000) // safety cap
+  claimCooldownSec Int     @default(0)      // min seconds between claims
+  sessionMaxHours  Float   @default(8)      // auto-cap accrual window (offline earnings limit)
+  tiersJson        String  @default("[]")   // JSON tiers for `tiered` strategy
+  updatedAt        DateTime @updatedAt
+}
+
+model MinerLevel {
+  id          String @id @default(cuid())
+  key         String @unique
+  name        String
+  order       Int    @unique
+  minHashRate Float  @default(0) // threshold to reach this level
+  icon        String @default("⛏️")
+  perksJson   String @default("[]")
+}
+
+// ---------------------------------------------------------------------------
+// Expedition / story
+// ---------------------------------------------------------------------------
+
+model Chapter {
+  id          String  @id @default(cuid())
+  key         String  @unique
+  order       Int     @unique
+  title       String
+  subtitle    String?
+  body        String  @default("")
+  status      String  @default("locked") // locked | active | completed
+  unlockType  String  @default("none")   // none | milestone
+  milestoneKey String?
+  imageKey    String  @default("mine")
+  createdAt   DateTime @default(now())
+}
+
+model Milestone {
+  id          String  @id @default(cuid())
+  key         String  @unique
+  order       Int
+  title       String
+  description String  @default("")
+  current     Float   @default(0)
+  target      Float   @default(0)
+  unit        String  @default("Miners")
+  reachedAt   DateTime?
+}
+
+model Mission {
+  id          String  @id @default(cuid())
+  key         String  @unique
+  order       Int
+  chapterKey  String?
+  title       String
+  description String  @default("")
+  type        String  @default("action") // action | referral | hold | social
+  target      Float   @default(1)
+  reward      Float   @default(0)
+  active      Boolean @default(true)
+  state       UserMission[]
+}
+
+model UserMission {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  missionId String
+  mission   Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  progress  Float    @default(0)
+  completed Boolean  @default(false)
+  claimed   Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, missionId])
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  body      String   @default("")
+  pinned    Boolean  @default(false)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+// Generic key/value for app-wide + token settings (swap link, jetton address, etc.)
+model AppSetting {
+  key       String @id
+  value     String @default("")
+  updatedAt DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Admin
+// ---------------------------------------------------------------------------
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  role         String   @default("admin") // admin | superadmin
+  createdAt    DateTime @default(now())
+  lastLoginAt  DateTime?
+}

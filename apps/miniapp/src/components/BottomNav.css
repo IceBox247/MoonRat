@@ -1,0 +1,73 @@
+.bottom-nav {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  padding: 0 10px calc(8px + var(--safe-bottom));
+  pointer-events: none;
+}
+
+.bottom-nav-inner {
+  pointer-events: auto;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  height: var(--nav-h);
+  align-items: center;
+  background: linear-gradient(180deg, rgba(13, 18, 38, 0.85), rgba(8, 11, 24, 0.96));
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--line-strong);
+  border-radius: 20px;
+  box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 100%;
+  text-decoration: none;
+  color: var(--text-faint);
+  transition: color 0.2s ease, transform 0.15s ease;
+  border-radius: 16px;
+  position: relative;
+}
+
+.nav-item .nav-icon {
+  display: grid;
+  place-items: center;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.nav-item .nav-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.nav-item.active {
+  color: var(--cyan);
+}
+
+.nav-item.active .nav-icon {
+  transform: translateY(-2px);
+  filter: drop-shadow(0 0 8px var(--cyan-glow));
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: radial-gradient(circle, rgba(53, 230, 255, 0.18), transparent 70%);
+}
+
+.nav-item:active {
+  transform: scale(0.92);
+}

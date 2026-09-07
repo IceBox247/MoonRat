@@ -1,0 +1,45 @@
+:root {
+  /* Core palette — underground TON mine */
+  --bg-void: #05070f;
+  --bg-deep: #080b18;
+  --bg-panel: #0d1226;
+  --bg-panel-2: #121a33;
+  --bg-elevated: #16203f;
+
+  --line: rgba(120, 170, 255, 0.10);
+  --line-strong: rgba(120, 170, 255, 0.22);
+
+  /* TON blue / electric cyan */
+  --ton: #2ab7ff;
+  --ton-bright: #4fd2ff;
+  --cyan: #35e6ff;
+  --cyan-glow: rgba(53, 230, 255, 0.55);
+  --blue-deep: #1560f0;
+
+  /* Gold accents */
+  --gold: #ffcb45;
+  --gold-deep: #e5a12a;
+  --gold-glow: rgba(255, 203, 69, 0.45);
+
+  /* Text */
+  --text: #eaf2ff;
+  --text-dim: #9fb2d8;
+  --text-faint: #6b7ba3;
+
+  /* State */
+  --good: #43e59b;
+  --warn: #ffb347;
+  --danger: #ff5d73;
+
+  /* Radii + shadow */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-xl: 28px;
+  --shadow-crystal: 0 0 40px var(--cyan-glow);
+  --shadow-gold: 0 0 30px var(--gold-glow);
+
+  --nav-h: 74px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
