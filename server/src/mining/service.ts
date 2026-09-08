@@ -37,10 +37,21 @@ export async function refreshUserHashRate(userId: string) {
   if (!user) throw new Error('user_not_found');
 
   let balance = user.moonratBalance;
+  let readOk = true;
   if (user.walletAddress) {
     const provider = getBalanceProvider();
-    balance = await provider.getMoonratBalance(user.walletAddress);
+    const read = await provider.getMoonratBalance(user.walletAddress);
+    // INVARIANT: a failed read is `null` (unknown) — KEEP the last known balance.
+    // Never write 0 on a throttle/error; that would wipe real holdings + mining power.
+    if (read === null) {
+      readOk = false;
+    } else {
+      balance = read;
+    }
   }
+
+  // If the read failed, don't recompute or overwrite anything — keep last known state.
+  if (!readOk) return user;
 
   const cfg = await getMiningConfig();
   const hashRate = computeHashRate(balance, cfg as unknown as MiningConfigLike);
@@ -151,23 +162,30 @@ export async function claimRewards(userId: string) {
   }
 
   const amount = session.accruedUnclaimed;
-  await prisma.$transaction([
-    prisma.miningSession.update({
-      where: { userId },
-      data: { accruedUnclaimed: 0, lastAccruedAt: new Date() },
-    }),
-    prisma.claim.create({ data: { userId, amount, status: 'credited' } }),
-    prisma.vaultTransaction.create({
+
+  // Exactly-once credit. The guard below is the ONLY thing that moves money — do not
+  // "simplify" it into an unconditional update. Two concurrent claims both read `amount`;
+  // the conditional decrement can succeed for only ONE of them (the row no longer has
+  // `>= amount` pending after the first wins), so we never double-credit.
+  const claimed = await prisma.$transaction(async (tx) => {
+    const guard = await tx.miningSession.updateMany({
+      where: { userId, accruedUnclaimed: { gte: amount } },
+      data: { accruedUnclaimed: { decrement: amount }, lastAccruedAt: new Date() },
+    });
+    if (guard.count !== 1) return 0; // lost the race — another claim already took it
+    await tx.claim.create({ data: { userId, amount, status: 'credited' } });
+    await tx.vaultTransaction.create({
       data: { userId, type: 'mining_claim', amount, note: 'Mining rewards claimed' },
-    }),
-    prisma.user.update({
+    });
+    await tx.user.update({
       where: { id: userId },
       data: { claimedTotal: { increment: amount }, vaultBalance: { increment: amount } },
-    }),
-  ]);
+    });
+    return amount;
+  });
 
   const updatedSession = await prisma.miningSession.findUnique({ where: { userId } });
-  return { claimed: amount, session: updatedSession };
+  return { claimed, session: updatedSession };
 }
 
 /**

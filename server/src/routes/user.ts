@@ -37,9 +37,21 @@ const connectSchema = z.object({ walletAddress: z.string().min(10).max(120) });
 userRouter.post('/wallet/connect', requireUser, async (req: AuthedRequest, res) => {
   const parsed = connectSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: 'bad_request' });
+
+  const walletAddress = parsed.data.walletAddress;
+  // Anti-fraud: one wallet -> one account. Reject if bound to a different miner.
+  // NOTE(production): normalize addresses to raw form (0:...) before comparing, since
+  // TON addresses have multiple string encodings (bounceable/non-bounceable/raw).
+  const existing = await prisma.user.findFirst({
+    where: { walletAddress, NOT: { id: req.user!.uid } },
+  });
+  if (existing) {
+    return res.status(409).json({ error: 'wallet_already_linked' });
+  }
+
   await prisma.user.update({
     where: { id: req.user!.uid },
-    data: { walletAddress: parsed.data.walletAddress },
+    data: { walletAddress },
   });
   const user = await refreshUserHashRate(req.user!.uid);
   res.json({

@@ -38,7 +38,39 @@ app.use('/api/admin', adminRouter);
 // Central error handler
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('[error]', err?.message ?? err);
+  if (res.headersSent) return;
   res.status(500).json({ error: 'internal_error' });
+});
+
+/**
+ * Express 4 does NOT forward rejected promises from async route handlers to the error
+ * middleware — an unhandled rejection would otherwise crash the whole server (downtime).
+ * Patch every registered handler so a thrown/rejected error goes to the error handler
+ * as a clean 500 instead. Recurses into mounted sub-routers (e.g. admin CRUD).
+ */
+function wrapAsyncHandlers(stack: any[]) {
+  for (const layer of stack) {
+    if (layer?.route?.stack) {
+      for (const s of layer.route.stack) {
+        const orig = s.handle;
+        if (typeof orig === 'function' && orig.length < 4 && !orig.__wrapped) {
+          const wrapped = function (this: unknown, req: any, res: any, next: any) {
+            Promise.resolve(orig.call(this, req, res, next)).catch(next);
+          };
+          (wrapped as any).__wrapped = true;
+          s.handle = wrapped;
+        }
+      }
+    } else if (layer?.handle && Array.isArray(layer.handle.stack)) {
+      wrapAsyncHandlers(layer.handle.stack);
+    }
+  }
+}
+wrapAsyncHandlers(((app as any)._router?.stack) ?? []);
+
+// Last-resort guard: never let a stray rejection take the process down.
+process.on('unhandledRejection', (reason) => {
+  console.error('[unhandledRejection]', (reason as Error)?.message ?? reason);
 });
 
 app.listen(config.port, () => {
