@@ -45,6 +45,16 @@ export default function MineScreen() {
     await tonConnectUI.openModal();
   };
 
+  // Tapping the coin: start mining when idle, claim when active with pending.
+  const onCoinTap = () => {
+    if (!state || busy) return;
+    if (state.mining) {
+      if (state.pending > 0) onClaim();
+    } else {
+      onToggleMining();
+    }
+  };
+
   if (!state) {
     return (
       <>
@@ -73,7 +83,7 @@ export default function MineScreen() {
         </div>
       </div>
 
-      <MoonratStage mining={state.mining} />
+      <MoonratStage mining={state.mining} onTap={onCoinTap} />
 
       {/* Live earnings display */}
       <Panel glow className="earn-panel">
