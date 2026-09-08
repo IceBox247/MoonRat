@@ -7,52 +7,50 @@
   overflow: visible;
 }
 
-/* Big radial glow behind the coin (ATF/Moola hero glow) */
+/* Big radial glow halo behind the logo (Moola/ATF hero glow) */
 .stage-glow {
   position: absolute;
-  width: 280px;
-  height: 280px;
+  width: 290px;
+  height: 290px;
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(53, 230, 255, 0.35),
-    rgba(42, 183, 255, 0.16) 42%,
-    transparent 68%
+    rgba(53, 230, 255, 0.32),
+    rgba(42, 183, 255, 0.14) 44%,
+    transparent 70%
   );
-  filter: blur(8px);
+  filter: blur(10px);
 }
 .stage-active .stage-glow {
   animation: pulseGlow 1.3s ease-in-out infinite;
 }
 @keyframes pulseGlow {
   0%, 100% { opacity: 0.75; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.1); }
+  50% { opacity: 1; transform: scale(1.12); }
 }
 
-/* Rotating conic aura ring around the coin */
+/* Soft rotating light sweep behind the logo (no hard coin edge) */
 .stage-aura {
   position: absolute;
-  width: 256px;
-  height: 256px;
+  width: 300px;
+  height: 300px;
   border-radius: 50%;
   background: conic-gradient(
     from 0deg,
     transparent 0deg,
-    rgba(53, 230, 255, 0.55) 60deg,
-    transparent 120deg,
-    rgba(255, 203, 69, 0.5) 200deg,
-    transparent 260deg,
-    rgba(53, 230, 255, 0.55) 320deg,
-    transparent 360deg
+    rgba(53, 230, 255, 0.30) 50deg,
+    transparent 130deg,
+    rgba(255, 203, 69, 0.26) 210deg,
+    transparent 300deg,
+    rgba(53, 230, 255, 0.30) 360deg
   );
-  mask: radial-gradient(circle, transparent 46%, #000 47%, #000 50%, transparent 51%);
-  -webkit-mask: radial-gradient(circle, transparent 46%, #000 47%, #000 50%, transparent 51%);
-  opacity: 0.6;
-  animation: spin 14s linear infinite;
+  filter: blur(22px);
+  opacity: 0.55;
+  animation: spin 16s linear infinite;
 }
 .stage-active .stage-aura {
-  opacity: 1;
-  animation: spin 5s linear infinite;
+  opacity: 0.9;
+  animation: spin 6s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -66,20 +64,20 @@
   place-items: center;
   cursor: pointer;
 }
+/* Full logo shown whole — contain, no circular crop */
 .stage-coin {
-  width: 222px;
-  height: 222px;
-  border-radius: 50%;
-  object-fit: cover;
-  filter: drop-shadow(0 0 26px rgba(53, 230, 255, 0.5)) drop-shadow(0 12px 22px rgba(0, 0, 0, 0.6));
+  width: 256px;
+  height: 256px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 22px rgba(53, 230, 255, 0.45)) drop-shadow(0 10px 20px rgba(0, 0, 0, 0.55));
 }
 .stage-active .stage-coin {
-  filter: drop-shadow(0 0 40px rgba(53, 230, 255, 0.75)) drop-shadow(0 0 22px rgba(255, 203, 69, 0.4));
+  filter: drop-shadow(0 0 36px rgba(53, 230, 255, 0.7)) drop-shadow(0 0 20px rgba(255, 203, 69, 0.35));
 }
 
 .shard {
   position: absolute;
-  bottom: 70px;
+  bottom: 66px;
   width: 9px;
   height: 9px;
   z-index: 2;
@@ -91,7 +89,7 @@
 .spark {
   position: absolute;
   z-index: 4;
-  top: 40%;
+  top: 42%;
   width: 44px;
   height: 44px;
   background: radial-gradient(circle, rgba(255, 240, 180, 0.9), rgba(255, 203, 69, 0.2) 50%, transparent 70%);

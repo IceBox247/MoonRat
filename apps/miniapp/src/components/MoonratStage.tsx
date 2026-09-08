@@ -2,8 +2,10 @@ import { motion } from 'framer-motion';
 import './MoonratStage.css';
 
 /**
- * The mining hero: a big glowing Moonrat coin front-and-center (ATF/Moola style).
- * Tap it to start mining / claim. Spins + throws crystal shards while active.
+ * The mining hero: the big Moonrat logo front-and-center (Moola/ATF style).
+ * Tap it to start mining / claim. Glows + throws crystal shards while active.
+ * The logo is a shield/wordmark (not a round coin) so it floats & pulses rather
+ * than spinning.
  */
 export default function MoonratStage({
   mining,
@@ -14,9 +16,9 @@ export default function MoonratStage({
 }) {
   return (
     <div className={`stage ${mining ? 'stage-active' : ''}`}>
-      {/* Radial hero glow */}
+      {/* Radial hero glow halo */}
       <div className="stage-glow" />
-      {/* Rotating aura ring */}
+      {/* Slow sparkle sweep behind the logo */}
       <div className="stage-aura" />
 
       {/* Crystal shards fly out while mining */}
@@ -32,20 +34,24 @@ export default function MoonratStage({
           />
         ))}
 
-      {/* The coin */}
+      {/* The logo */}
       <motion.button
         type="button"
         className="stage-coin-btn"
         onClick={onTap}
-        whileTap={{ scale: 0.94 }}
+        whileTap={{ scale: 0.95 }}
         aria-label={mining ? 'Tap to claim' : 'Tap to mine'}
       >
         <motion.img
-          src="/assets/moonrat-badge.png"
-          alt="Moonrat coin"
+          src="/assets/moonrat-hero.png"
+          alt="Moonrat"
           className="stage-coin"
           draggable={false}
-          animate={mining ? { rotateZ: [0, 3, -3, 0], y: [0, -4, 0] } : { y: [0, -8, 0] }}
+          animate={
+            mining
+              ? { scale: [1, 1.035, 1], rotateZ: [0, 1.5, -1.5, 0] }
+              : { y: [0, -8, 0] }
+          }
           transition={
             mining
               ? { duration: 1.1, repeat: Infinity, ease: 'easeInOut' }
