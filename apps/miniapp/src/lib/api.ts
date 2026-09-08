@@ -1,3 +1,5 @@
+import { isDemo, enableDemo, demoResponse } from './demo';
+
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 
 let token: string | null = localStorage.getItem('moonrat_token');
@@ -13,13 +15,25 @@ export function getToken() {
 }
 
 async function request<T>(path: string, opts: RequestInit = {}): Promise<T> {
+  // Demo/offline mode: serve canned data with no backend.
+  if (isDemo()) {
+    return demoResponse(path, (opts.method || 'GET').toUpperCase()) as T;
+  }
+
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(opts.headers as Record<string, string>),
   };
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const res = await fetch(`${API_BASE}${path}`, { ...opts, headers });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, { ...opts, headers });
+  } catch (netErr) {
+    // Network unreachable (no backend) -> fall back to demo data so the UI is browsable.
+    enableDemo();
+    return demoResponse(path, (opts.method || 'GET').toUpperCase()) as T;
+  }
   if (!res.ok) {
     let body: any = null;
     try {
