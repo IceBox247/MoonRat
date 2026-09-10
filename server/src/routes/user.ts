@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { prisma } from '../db.js';
-import { requireUser, type AuthedRequest } from '../auth/jwt.js';
-import { refreshUserHashRate, getLevels, levelForHashRate } from '../mining/service.js';
+import { prisma } from '../db';
+import { requireUser, type AuthedRequest } from '../auth/jwt';
+import { refreshUserHashRate, getLevels, levelForHashRate } from '../mining/service';
 
 export const userRouter = Router();
 

@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { prisma } from '../db.js';
-import { config } from '../config.js';
-import { verifyTelegramInitData, parseDevAuth } from '../auth/telegram.js';
-import { signUserToken } from '../auth/jwt.js';
-import { uniqueReferralCode } from '../lib/referral.js';
+import { prisma } from '../db';
+import { config } from '../config';
+import { verifyTelegramInitData, parseDevAuth } from '../auth/telegram';
+import { signUserToken } from '../auth/jwt';
+import { uniqueReferralCode } from '../lib/referral';
 
 export const authRouter = Router();
 

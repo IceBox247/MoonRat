@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { prisma } from '../db.js';
-import { requireUser, type AuthedRequest } from '../auth/jwt.js';
+import { prisma } from '../db';
+import { requireUser, type AuthedRequest } from '../auth/jwt';
 
 export const expeditionRouter = Router();
 expeditionRouter.use(requireUser);

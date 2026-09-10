@@ -1,4 +1,4 @@
-import { prisma } from './db.js';
+import { prisma } from './db';
 
 async function main() {
   console.log('🌱 Seeding Moonrat...');

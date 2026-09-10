@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { prisma } from '../db.js';
-import { config } from '../config.js';
-import { requireUser, type AuthedRequest } from '../auth/jwt.js';
+import { prisma } from '../db';
+import { config } from '../config';
+import { requireUser, type AuthedRequest } from '../auth/jwt';
 
 export const crewRouter = Router();
 crewRouter.use(requireUser);

@@ -5,7 +5,9 @@
 // migrate amount columns to Decimal on Postgres.
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // "native" for local dev; the rhel target is the Vercel/AWS Lambda serverless runtime.
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {

@@ -2,7 +2,6 @@
   "name": "server",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "prisma generate && tsc -p tsconfig.json",
@@ -14,7 +13,8 @@
     "gen:pg": "node scripts/pg-schema.mjs",
     "build:prod": "npm run gen:pg && prisma generate --schema prisma/schema.pg.prisma && tsc -p tsconfig.json",
     "predeploy:prod": "npm run gen:pg && prisma db push --schema prisma/schema.pg.prisma --skip-generate --accept-data-loss && node dist/seed.js",
-    "start:prod": "node dist/index.js"
+    "start:prod": "node dist/index.js",
+    "vercel-build": "npm run gen:pg && prisma generate --schema prisma/schema.pg.prisma && prisma db push --schema prisma/schema.pg.prisma --skip-generate --accept-data-loss && tsx src/seed.ts"
   },
   "prisma": {
     "schema": "prisma/schema.prisma"

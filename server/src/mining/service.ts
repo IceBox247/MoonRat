@@ -1,7 +1,7 @@
-import { prisma } from '../db.js';
-import { config } from '../config.js';
-import { computeHashRate, computeAccrual, type MiningConfigLike } from './formula.js';
-import { getBalanceProvider } from '../ton/balanceProvider.js';
+import { prisma } from '../db';
+import { config } from '../config';
+import { computeHashRate, computeAccrual, type MiningConfigLike } from './formula';
+import { getBalanceProvider } from '../ton/balanceProvider';
 
 const DEFAULT_CONFIG_ID = 'singleton';
 

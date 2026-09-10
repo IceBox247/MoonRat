@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { prisma } from '../db.js';
-import { config } from '../config.js';
+import { prisma } from '../db';
+import { config } from '../config';
 
 export const metaRouter = Router();
 

@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { prisma } from '../db.js';
-import { config } from '../config.js';
-import { requireAdmin, signAdminToken, type AuthedRequest } from '../auth/jwt.js';
+import { prisma } from '../db';
+import { config } from '../config';
+import { requireAdmin, signAdminToken, type AuthedRequest } from '../auth/jwt';
 
 export const adminRouter = Router();
 

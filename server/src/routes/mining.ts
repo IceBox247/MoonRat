@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { requireUser, type AuthedRequest } from '../auth/jwt.js';
-import { getMiningState, startMining, stopMining, claimRewards } from '../mining/service.js';
+import { requireUser, type AuthedRequest } from '../auth/jwt';
+import { getMiningState, startMining, stopMining, claimRewards } from '../mining/service';
 
 export const miningRouter = Router();
 miningRouter.use(requireUser);

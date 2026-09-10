@@ -1,4 +1,4 @@
-import { config } from '../config.js';
+import { config } from '../config';
 
 /**
  * Reads a wallet's $MOONRAT jetton balance in human units.
