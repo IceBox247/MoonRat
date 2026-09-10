@@ -14,9 +14,13 @@ balances or payouts look wrong.
 
 ## 1. STACK & LAYOUT
 
-- **Monorepo (npm workspaces):** `server/` + `apps/miniapp/` + `apps/admin/`.
-- **Server:** Node + Express + TypeScript, **Prisma** ORM. Dev DB = **SQLite**;
-  production = **Postgres** (switch `DATABASE_URL` + `provider` in `schema.prisma`).
+- **Single Vercel project:** the Mini App + the API live together in `apps/miniapp`.
+  The backend is a serverless function: `apps/miniapp/api/index.ts` exports the Express
+  app, whose source is `apps/miniapp/api/_server/**` (routes, mining, auth, ton). Prisma
+  schema is `apps/miniapp/prisma/`. `apps/admin/` is an optional separate dashboard.
+- **Server:** Node + Express + TypeScript (CommonJS), **Prisma** ORM. Dev DB = **SQLite**;
+  production = **Neon Postgres** (the build runs `scripts/pg-schema.mjs` to emit a
+  postgresql schema, then `prisma db push` + seed).
 - **Mini App:** React 18 + Vite + TypeScript, `@tonconnect/ui-react`, Telegram WebApp SDK,
   Framer Motion.
 - **Admin:** React + Vite, JWT-gated.
@@ -119,8 +123,11 @@ Owner moves fast, often on a phone, sends screenshots not logs.
 git fetch origin claude/moonrat-telegram-mini-app-9wp9tb
 git log --oneline -10 origin/claude/moonrat-telegram-mini-app-9wp9tb
 git status -sb
-cd server && npm run db:setup   # generates client, pushes schema, seeds (safe, idempotent)
-npm run build                   # from repo root
+npm install
+cp apps/miniapp/.env.example apps/miniapp/.env   # SQLite + mock + dev-auth
+npm run db:setup                # generate client, push schema, seed (idempotent)
+npm run dev:api                 # backend on :4000
+npm run dev:miniapp             # app on :5173 (proxies /api to :4000)
 ```
 Then state your plan before touching money-related code (mining credit, claims, balances,
 wallet binding, future withdrawals).

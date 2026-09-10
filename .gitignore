@@ -16,10 +16,10 @@ build/
 # Database (dev SQLite)
 *.db
 *.db-journal
-server/prisma/dev.db*
+apps/miniapp/prisma/dev.db*
 
 # Auto-generated Postgres schema (created at build by scripts/pg-schema.mjs)
-server/prisma/schema.pg.prisma
+apps/miniapp/prisma/schema.pg.prisma
 
 # Logs
 *.log

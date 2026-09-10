@@ -4,17 +4,16 @@
   "private": true,
   "description": "Moonrat — a story-driven meme token & mining game Telegram Mini App on TON. MINE • HOLD • EXPLORE.",
   "workspaces": [
-    "server",
     "apps/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace=server & npm run dev --workspace=@moonrat/miniapp",
-    "dev:server": "npm run dev --workspace=server",
+    "dev": "npm run dev:api --workspace=@moonrat/miniapp & npm run dev --workspace=@moonrat/miniapp",
+    "dev:api": "npm run dev:api --workspace=@moonrat/miniapp",
     "dev:miniapp": "npm run dev --workspace=@moonrat/miniapp",
     "dev:admin": "npm run dev --workspace=@moonrat/admin",
-    "build": "npm run build --workspaces --if-present",
-    "db:setup": "npm run db:setup --workspace=server",
-    "seed": "npm run seed --workspace=server"
+    "build": "npm run build --workspace=@moonrat/miniapp",
+    "db:setup": "npm run db:setup --workspace=@moonrat/miniapp",
+    "seed": "npm run seed --workspace=@moonrat/miniapp"
   },
   "engines": {
     "node": ">=20"
