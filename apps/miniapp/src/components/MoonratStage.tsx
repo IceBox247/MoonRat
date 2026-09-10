@@ -43,8 +43,8 @@ export default function MoonratStage({
         aria-label={mining ? 'Tap to claim' : 'Tap to mine'}
       >
         <motion.img
-          src="/assets/moonrat-mining.png"
-          alt="Moonrat mining"
+          src="/assets/moonrat-coin-hero.png"
+          alt="Moonrat coin"
           className="stage-coin"
           draggable={false}
           animate={

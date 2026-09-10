@@ -18,6 +18,9 @@ build/
 *.db-journal
 server/prisma/dev.db*
 
+# Auto-generated Postgres schema (created at build by scripts/pg-schema.mjs)
+server/prisma/schema.pg.prisma
+
 # Logs
 *.log
 npm-debug.log*

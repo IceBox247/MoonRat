@@ -10,7 +10,11 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:setup": "prisma generate && prisma db push && tsx src/seed.ts",
-    "seed": "tsx src/seed.ts"
+    "seed": "tsx src/seed.ts",
+    "gen:pg": "node scripts/pg-schema.mjs",
+    "build:prod": "npm run gen:pg && prisma generate --schema prisma/schema.pg.prisma && tsc -p tsconfig.json",
+    "predeploy:prod": "npm run gen:pg && prisma db push --schema prisma/schema.pg.prisma --skip-generate --accept-data-loss && node dist/seed.js",
+    "start:prod": "node dist/index.js"
   },
   "prisma": {
     "schema": "prisma/schema.prisma"
