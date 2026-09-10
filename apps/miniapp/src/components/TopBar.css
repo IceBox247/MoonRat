@@ -4,20 +4,14 @@
   justify-content: space-between;
   margin-bottom: 8px;
 }
-.topbar-brand { display: flex; align-items: center; gap: 9px; }
+.topbar-brand { display: flex; align-items: center; }
 .topbar-logo {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  object-fit: cover;
-  /* Blend the round badge into the dark UI: glow instead of a boxed thumbnail */
-  filter: drop-shadow(0 0 12px rgba(53, 230, 255, 0.45));
-  background: transparent;
-}
-.topbar-wordmark {
-  font-size: 17px;
-  font-weight: 900;
-  letter-spacing: 1px;
+  height: 46px;
+  width: auto;
+  max-width: 160px;
+  object-fit: contain;
+  /* Full MOONRAT logo (transparent) — glow so it blends with the dark UI */
+  filter: drop-shadow(0 0 12px rgba(53, 230, 255, 0.4));
 }
 .topbar-right { display: flex; align-items: center; gap: 8px; }
 

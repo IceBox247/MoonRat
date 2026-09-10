@@ -11,8 +11,7 @@ export default function TopBar() {
   return (
     <div className="topbar">
       <div className="topbar-brand" onClick={() => { haptic(); navigate('/'); }}>
-        <img src="/assets/moonrat-badge.png" alt="Moonrat" className="topbar-logo" />
-        <span className="topbar-wordmark gold-text">MOONRAT</span>
+        <img src="/assets/moonrat-hero.png" alt="Moonrat" className="topbar-logo" />
       </div>
 
       <div className="topbar-right">
