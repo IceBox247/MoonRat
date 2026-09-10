@@ -11,7 +11,7 @@
     "gen:pg": "node scripts/pg-schema.mjs",
     "db:setup": "prisma generate && prisma db push && tsx api/_server/seed.ts",
     "seed": "tsx api/_server/seed.ts",
-    "vercel-build": "node scripts/pg-schema.mjs && prisma generate --schema prisma/schema.pg.prisma && prisma db push --schema prisma/schema.pg.prisma --skip-generate --accept-data-loss && tsx api/_server/seed.ts && vite build"
+    "vercel-build": "node scripts/vercel-build.mjs"
   },
   "prisma": {
     "schema": "prisma/schema.prisma"
